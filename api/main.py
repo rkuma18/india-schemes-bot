@@ -4,6 +4,7 @@ from src.session_store import get_session, add_to_session, clear_session
 from src.rag_chain import build_rag_chain, ask
 from dotenv import load_dotenv
 import logging
+import threading
 
 load_dotenv()
 
@@ -11,6 +12,16 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="India Schemes WhatsApp Bot")
+def warmup():
+    """Pre-load the RAG chain in background so first request is fast."""
+    try:
+        logger.info("Warming up RAG chain...")
+        get_rag_chain()
+        logger.info("RAG chain ready.")
+    except Exception as e:
+        logger.error(f"Warmup failed: {e}")
+
+threading.Thread(target=warmup, daemon=True).start()
 rag_chain = None
 
 def get_rag_chain():
