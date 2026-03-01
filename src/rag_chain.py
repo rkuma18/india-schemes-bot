@@ -2,7 +2,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda
-from src.indexing import get_vectorstore
 from src.session_store import add_to_session
 from dotenv import load_dotenv
 import os
@@ -41,6 +40,7 @@ def get_llm():
 
 def build_rag_chain():
     """Build a RAG chain using LCEL with MMR retrieval."""
+    from src.indexing import get_vectorstore
     vectorstore = get_vectorstore()
 
     retriever = vectorstore.as_retriever(
