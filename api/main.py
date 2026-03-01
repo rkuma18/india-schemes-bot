@@ -11,7 +11,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="India Schemes WhatsApp Bot")
-rag_chain = build_rag_chain()
+rag_chain = None
+
+def get_rag_chain():
+    global rag_chain
+    if rag_chain is None:
+        rag_chain = build_rag_chain()
+    return rag_chain
 
 GREETING_KEYWORDS = {"hi", "hello", "namaste", "hey", "helo", "hii"}
 RESET_KEYWORDS = {"reset", "clear", "start over", "restart", "new"}
@@ -84,7 +90,7 @@ async def webhook(
     # Build RAG chain and get answer
     try:
         history = get_session(phone_number)
-        answer = ask(rag_chain, user_message, history)
+        answer = ask(get_rag_chain(), user_message, history)
         add_to_session(phone_number, user_message, answer)
     except Exception as e:
         logger.error(f"Error processing message: {e}")
